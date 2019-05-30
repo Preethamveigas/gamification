@@ -1,5 +1,6 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
+import { Constants } from "expo";
 import {
   Container,
   Header,
@@ -17,23 +18,23 @@ import Slider from "./compo/Slider";
 export default class App extends React.Component {
   render() {
     return (
-      <Container style={styles.container}>
-        <Header>
+      <Container style={{ paddingTop: Constants.statusBarHeight }}>
+        <Header style={{ borderColor: "red", borderWidth: 1 }}>
           <Left>
             <Button transparent>
-              <Icon name="arrow-back" />
+              <Image source={Logo} style={{ resizeMode: "contain" }} />
             </Button>
           </Left>
-          <Body>
-            <Title>Header</Title>
-          </Body>
+          {/* <Body>
+            <Title style={{ color: "red" }}> Header</Title>
+          </Body> */}
           <Right>
             <Button transparent>
-              <Icon name="menu" />
+              <Text>Niveus Solutions</Text>
             </Button>
           </Right>
         </Header>
-        <StatusContainer />
+        {/* <StatusContainer /> */}
         <DragContainer />
         <Slider />
       </Container>
