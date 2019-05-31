@@ -1,64 +1,29 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  Dimensions,
-  TouchableHighlight,
-  TouchableOpacity
-} from "react-native";
+import { StyleSheet, Text, View, Image, Dimensions } from "react-native";
 import { Constants, DangerZone, Font, LinearGradient } from "expo";
-import {
-  Ionicons,
-  Feather,
-  AntDesign,
-  SimpleLineIcons
-} from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import Slider from "react-native-slider";
 
 const { Animated } = DangerZone;
-const { Value, max, add, round, divide } = Animated;
-import {
-  Container,
-  Header,
-  Left,
-  Body,
-  Right,
-  Button,
-  Icon,
-  Title,
-  Switch,
-  Root,
-  CardItem,
-  Card,
-  Toast,
-  Footer
-} from "native-base";
+const { Value } = Animated;
+import { Header, Left, Right, Button, Switch, Root } from "native-base";
 import Logo from "./assets/logo.png";
 import anthosLogo from "./assets/anthoslogo.jpg";
 import StatusContainer from "./StatusContainer";
 import DragContainer from "./DragContainer";
 import Draggitems from "./compo/Slider";
 
-const { width: totalWidth } = Dimensions.get("window");
+const { width: totalWidth, height: totalHeight } = Dimensions.get("window");
 const count = 5;
 const width = totalWidth / count;
 const height = width;
-
-const LOAD_TEST = "http://35.224.245.248:1200/enablelike";
 
 import RightDrg from "./compo/CommentDrag";
 export default class App extends React.Component {
   // Later on in your component
   state = {
     value: 1,
-    loading: true,
-    comment: false,
-    like: false,
-    dislike: false,
-    discomm: false,
-    reset: false
+    loading: true
   };
   async componentDidMount() {
     await Font.loadAsync({
@@ -70,11 +35,16 @@ export default class App extends React.Component {
 
   render() {
     const x = new Value(0);
-    return (
+    return this.state.loading ? (
+      <View>
+        <Text>Loading</Text>
+      </View>
+    ) : (
       <Root>
-        <Container
+        <View
           style={{
-            paddingTop: Constants.statusBarHeight
+            paddingTop: Constants.statusBarHeight,
+            height: totalHeight
           }}
         >
           <Header style={{ height: 90 }}>
@@ -88,30 +58,16 @@ export default class App extends React.Component {
           </Body> */}
             <Right>
               <Image source={anthosLogo} style={{ resizeMode: "cover" }} />
-              <TouchableOpacity
-                style={{
-                  padding: 30,
-                  paddingRight: 60,
-                  alignContent: "center",
-                  alignSelf: "center"
-                }}
-                onPress={() => {
-                  Toast.show({
-                    text: "Feature is not enabled",
-                    buttonText: "Okay",
-                    duration: 5000
-                  });
-                }}
+              <Button
+                transparent
+                style={{ alignContent: "center", alignSelf: "center" }}
               >
-                <Switch
-                  value={false}
-                  style={{ backgroundColor: "red", width: 0 }}
-                />
-              </TouchableOpacity>
+                <Switch value={false} />
+              </Button>
             </Right>
           </Header>
           {/* <StatusContainer /> */}
-          <View style={{ height: 500 }}>
+          <View style={{ height: totalHeight / 2 + 50 }}>
             <LinearGradient
               colors={["#ba6698", "#ba6698", "#631f47"]}
               style={{
@@ -179,14 +135,13 @@ export default class App extends React.Component {
               <DragContainer />
             </LinearGradient>
           </View>
-          <Draggitems reset={this.state.reset} />
+
+          <Draggitems />
 
           <View
             style={{
               height: 500,
-              marginTop: 60,
-              marginLeft: 30,
-              marginRight: 30
+              marginTop: 60
             }}
           >
             <LinearGradient
@@ -194,7 +149,7 @@ export default class App extends React.Component {
               style={{
                 padding: 15,
                 alignItems: "center",
-                borderRadius: 15,
+                borderRadius: 5,
                 paddingLeft: 30,
                 paddingRight: 30
               }}
@@ -219,21 +174,15 @@ export default class App extends React.Component {
 
               <Slider
                 value={this.state.value}
-                minimumTrackTintColor={"#87ceeb"}
+                minimumTrackTintColor={"#3f3f3f"}
                 thumbTintColor={"#fff"}
                 minimumValue={1}
                 thumbTouchSize={{ width: 80, height: 80 }}
-                maximumValue={2000}
+                maximumValue={200}
                 trackStyle={"#fff"}
                 animateTransitions={true}
                 animationType={"timing"}
-                onValueChange={value => {
-                  this.setState({ value });
-                  axios
-                    .get(`${LOAD_TEST},`)
-                    .then(res => {})
-                    .catch(err => {});
-                }}
+                onValueChange={value => this.setState({ value })}
                 style={{ width: "100%", paddingLeft: 30, paddingRight: 30 }}
               />
               <Text
@@ -290,102 +239,7 @@ export default class App extends React.Component {
           </View>
 
           {/* <RightDrg size={height} {...{ x, count }} /> */}
-          <Footer
-            style={{
-              position: "absolute",
-              bottom: 0,
-              height: 80,
-              backgroundColor: "#006400"
-            }}
-          >
-            <Body>
-              <Right style={{ borderColor: "white", borderRightWidth: 1 }}>
-                <TouchableOpacity
-                  onPress={() => {
-                    alert("Services will Reset");
-                    const { like, comment, discomm, dislike } = this.state;
-                    this.setState({ reset: true });
-                  }}
-                  style={{
-                    width: "100%",
-                    justifyContent: "center",
-                    alignContent: "center",
-                    alignItems: "center",
-                    alignSelf: "center",
-                    backgroundColor: "red",
-                    height: 80
-                  }}
-                >
-                  <SimpleLineIcons
-                    name="reload"
-                    size={32}
-                    color="#fff"
-                    style={{
-                      position: "absolute",
-                      left: "30%",
-                      top: 20
-                    }}
-                  />
-                  <Text
-                    style={{
-                      fontSize: 25,
-                      fontWeight: "900",
-                      lineHeight: 50,
-                      color: "#fff",
-                      textAlign: "left",
-                      fontFamily: "Helvetica",
-                      paddingLeft: 30,
-                      paddingRight: 30
-                    }}
-                  >
-                    Reset
-                  </Text>
-                </TouchableOpacity>
-              </Right>
-              <Left>
-                <TouchableOpacity
-                  onPress={() => {
-                    alert("Deploy will be initiated");
-                    const { like, comment, discomm, dislike } = this.state;
-                  }}
-                  style={{
-                    width: "100%",
-                    justifyContent: "center",
-                    alignContent: "center",
-                    alignItems: "center",
-                    alignSelf: "center",
-                    height: 80
-                  }}
-                >
-                  <AntDesign
-                    name="rocket1"
-                    size={32}
-                    color="#fff"
-                    style={{
-                      position: "absolute",
-                      left: "30%",
-                      top: 20
-                    }}
-                  />
-                  <Text
-                    style={{
-                      fontSize: 25,
-                      fontWeight: "900",
-                      lineHeight: 50,
-                      color: "#fff",
-                      textAlign: "left",
-                      fontFamily: "Helvetica",
-                      paddingLeft: 30,
-                      paddingRight: 30
-                    }}
-                  >
-                    Deploy
-                  </Text>
-                </TouchableOpacity>
-              </Left>
-            </Body>
-          </Footer>
-        </Container>
+        </View>
       </Root>
     );
   }

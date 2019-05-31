@@ -1,122 +1,142 @@
-import React, { Component } from "react";
-import { StyleSheet, View, Text, PanResponder, Animated } from "react-native";
+import * as React from "react";
+import { StyleSheet, View, Button, Text } from "react-native";
+import { DangerZone } from "expo";
+import { Interactable } from "react-native-redash";
+import axios from "axios";
+const { Animated } = DangerZone;
 
-export default class CommentDrag extends Component {
+const COM_URI = "http://35.224.245.248:1200/enablecomment";
+const DISCOM_URI = "http://35.224.245.248:1200/disablecomment";
+
+import { Feather } from "@expo/vector-icons";
+
+export default class RightDrag extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      showDraggable: true,
-      dropAreaValues: null,
-      pan: new Animated.ValueXY(),
-      opacity: new Animated.Value(1)
+      snapToIndex: [{ x: 50, y: -300 }],
+      snapped: false,
+      color: "#ffffff",
+      backgroundColor: "#fe5f55",
+      comment: "Comment /Off"
     };
-
-    this._val = { x:10, y:20 }
-    this.state.pan.addListener((value) => this._val = value);
-
-    this.panResponder = PanResponder.create({
-        onStartShouldSetPanResponder: (e, gesture) => true,
-        onPanResponderGrant: (e, gesture) => {
-          this.state.pan.setOffset({
-            x: this._val.x,
-            y:this._val.y
-          })
-          this.state.pan.setValue({ x:0, y:0})
-        },
-        onPanResponderMove: Animated.event([ 
-          null, { dx: this.state.pan.x, dy: this.state.pan.y }
-        ]),
-        onPanResponderRelease: (e, gesture) => {
-          if (this.isDropArea(gesture)) {
-            // Animated.timing(this.state.opacity, {
-            //   toValue: 0,
-            //   duration: 1000
-            // }).start(() =>
-            //   this.setState({
-            //     showDraggable: false
-            //   })
-            // );
-          } 
-          else{
-            Animated.timing(this.state.pan, {
-              toValue: {x:0,y:0},
-              friction:5
-            }).start();
-          }
-        }
-      });
-
+    this.dddd = "";
+    this.snapps = this.snapps.bind(this);
   }
 
-  componentDidMount() {
-  
-
-   
+  onButtonPress() {
+    // this.refs["headInstance"].snapTo({ index: this.state.snapToIndex });
+    this.setState({
+      snapToIndex: (this.state.snapToIndex + 1) % 10
+    });
   }
+  dragged = ({ nativeEvent }) => {
+    // console.log("Drags", nativeEvent.x, nativeEvent.y);
 
-  isDropArea(gesture) {
-    return gesture.moveY < 200;
-  }
+    if (nativeEvent.x < 51 && nativeEvent.y < -300) {
+    }
+  };
+
+  snapps = ({ nativeEvent }) => {
+    if (nativeEvent.x === -20 && nativeEvent.y === -260) {
+      if (!this.state.snapped) {
+        this.setState({
+          snapped: true,
+          backgroundColor: "green",
+          color: "white",
+          comment: "Comment /On"
+        });
+
+        axios
+          .post(`${COM_URI}`)
+          .then(res => alert("Deployement Success"))
+          .catch(err => console.log(JSON.stringify(err)));
+      }
+    }
+    if (nativeEvent.x === -0 && nativeEvent.y === undefined) {
+      if (this.state.snapped) {
+        this.setState({
+          snapped: false,
+          backgroundColor: "#fe5f55",
+          color: "#fff",
+          comment: "Comment /Off"
+        });
+
+        console.log(`${DISCOM_URI}`);
+        axios
+          .get(`${DISCOM_URI}`)
+          .then(res => console.log(JSON.stringify(res.data)))
+          .catch(err => console.log(JSON.stringify(err.data)));
+      }
+    }
+  };
 
   render() {
+    const { color } = this.state;
+    const { size, count, x: animatedValueX } = this.props;
+    // const snapPoints = new Array(count)
+    //   .fill(0)
+    //   .map((e, i) => ({ y: -(i * size) }));
+    // const index = round(divide(animatedValueX, size));
+    let snapPoints = [{ x: -0 }, { x: -20, y: -260 }];
+    // console.log(snapPoints);
+    // console.log(JSON.stringify(this.dddd));
+    // console.log(t);
+
     return (
-      <View style={{ width: "20%", alignItems: "center" }}>
-        {this.renderDraggable()}
-      </View>
+      <Interactable
+        {...{ snapPoints, animatedValueX }}
+        style={[
+          {
+            position: "absolute",
+            right: 400,
+            bottom: 25
+          }
+        ]}
+        onDrag={this.dragged}
+        onSnap={this.snapps}
+      >
+        <Animated.View
+          style={{
+            ...StyleSheet.absoluteFillObject,
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            backgroundColor: "white",
+            elevation: 5,
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 2
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            alignSelf: "flex-end",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: this.state.backgroundColor
+          }}
+        >
+          {
+            // For an implementation of ReText on android look at
+            // https://bit.ly/2DXZFbS
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "cent",
+                paddingTop: 10
+              }}
+            >
+              <Feather name="message-circle" size={60} color="white" />
+              <Button
+                title={""}
+                onPress={this.onButtonPress.bind(this)}
+                color={color}
+              />
+            </View>
+          }
+        </Animated.View>
+      </Interactable>
     );
   }
-
-  renderDraggable() {
-    const panStyle = {
-      transform: this.state.pan.getTranslateTransform()
-    }
-    if (this.state.showDraggable) {
-      return (
-        <View style={{ position: "absolute" }}>
-          <Animated.View
-            {...this.panResponder.panHandlers}
-            style={[panStyle, styles.circle, {opacity:this.state.opacity}]}
-          >
-              <Text>Comment</Text>
-          </Animated.View>
-        </View>
-      );
-    }
-  }
 }
-
-
-
-
-let CIRCLE_RADIUS = 40;
-const styles = StyleSheet.create({
-  mainContainer: {
-    flex: 1
-  },
-  ballContainer: {
-    height:200
-  },
-  circle: {
-    backgroundColor: "skyblue",
-    width: CIRCLE_RADIUS * 2,
-    height: CIRCLE_RADIUS * 2,
-    borderRadius: 10,
-    textAlign:'center'
-  },
-  row: {
-    flexDirection: "row"
-  },  
-  dropZone: {
-    height: 200,
-    backgroundColor: "#00334d"
-  },
-  text: {
-    marginTop: 25,
-    marginLeft: 5,
-    marginRight: 5,
-    textAlign: "center",
-    color: "#fff",
-    fontSize: 25,
-    fontWeight: "bold"
-  }
-});

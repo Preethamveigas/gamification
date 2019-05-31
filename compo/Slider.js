@@ -1,7 +1,7 @@
 import * as React from "react";
-import { View, Dimensions, StyleSheet } from "react-native";
-import { DangerZone } from "expo";
-
+import { View, Dimensions, StyleSheet, Text } from "react-native";
+import { DangerZone, LinearGradient } from "expo";
+import RightSlide from "./CommentDrag";
 import Cursor from "./Cursor";
 import Labels from "./Label";
 
@@ -10,10 +10,11 @@ const { Value, max, add, round, divide } = Animated;
 
 const { width: totalWidth } = Dimensions.get("window");
 const count = 5;
-const width = totalWidth / count;
+const width = totalWidth / count - 20;
 const height = width;
 
-export default () => {
+export default props => {
+  const reset = props;
   const x = new Value(0);
   return (
     <View style={styles.container}>
@@ -23,15 +24,37 @@ export default () => {
           top: 0,
           left: 0,
           right: 0,
-          backgroundColor: "#bd536d",
           width: "100%",
           height,
-          borderRadius: height / 2
-          //   transform: [{ rotate: "-18deg" }]
+          borderRadius: 15
         }}
       />
-      {/* <Labels size={heig/ht} {...{ x, count }} /> */}
-      <Cursor size={height} {...{ x, count }} />
+      {/* <Labels size={height} {...{ x, count }} /> */}
+      <View
+        style={{
+          justifyContent: "space-around",
+          alignContent: "center",
+          alignItems: "center",
+          flexDirection: "row",
+          padding: 20
+        }}
+      >
+        <Text
+          style={{
+            justifyContent: "center",
+            color: "white",
+            alignContent: "center",
+            alignItems: "center",
+            textAlign: "center",
+            fontSize: 20
+          }}
+        >
+          New Features
+        </Text>
+        <Cursor size={height} {...{ x, count }} reset={reset} />
+        <RightSlide size={height} {...{ x, count }} reset={reset} />
+        {/* <RestButton  Disable={true} /> */}
+      </View>
     </View>
   );
 };

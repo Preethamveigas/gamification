@@ -11,9 +11,8 @@ const Like_URI = "http://35.224.245.248:1200/enablelike";
 const disLike_URI = "http://35.224.245.248:1200/disablelike";
 
 const { Animated } = DangerZone;
-const { Value } = Animated;
 
-export default class Cursor extends React.Component {
+export default class Cursor1 extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -21,8 +20,7 @@ export default class Cursor extends React.Component {
       snapped: false,
       color: "#fff",
       backgroundColor: "#fe5f55",
-      like: "like /off",
-      fadeAnim: new Animated.Value(0) // Initial value for opacity: 0
+      like: "like /off"
     };
     this.dddd = "";
     this.snapps = this.snapps.bind(this);
@@ -99,9 +97,9 @@ export default class Cursor extends React.Component {
     // console.log("rendering");
     // console.log(JSON.stringify(this.dddd));
     // console.log(t);
-
+    console.log(reset.reset);
     return reset.reset ? (
-      <Animated.Interactable
+      <Interactable
         {...{ snapPoints, animatedValueX }}
         style={[
           {
@@ -152,7 +150,7 @@ export default class Cursor extends React.Component {
             </View>
           }
         </Animated.View>
-      </Animated.Interactable>
+      </Interactable>
     ) : (
       <Interactable
         snapPoints={[{ y: -0 }, { x: 50, y: -260 }]}
